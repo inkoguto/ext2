@@ -1,48 +1,63 @@
-def integer_decoder(value):
-    return int.from_bytes(value, byteorder='little')
+import datetime
 
-def string_decoder():
-    pass
+class Ext2Decoder:
+    def __init__(self):
+        pass
 
-def datetime_decoder():
-    pass
+    def detect(self, _type):
+        if _type == Item.TYPE_NUMERIC:
+            return lambda x : int.from_bytes(x, byteorder='little')
+        elif _type == Item.TYPE_STRING:
+            return lambda x : x
+        elif _type == Item.TYPE_DATETIME:
+            return lambda x :  datetime.datetime.fromtimestamp(int.from_bytes(x, byteorder='little')).isoformat() if int.from_bytes(x, byteorder='little') > 0  else 0
+        elif _type == Item.TYPE_SIZE:
+            return lambda x : 1024 << int.from_bytes(x, byteorder='little')
+
+    def decode(self, item):
+        decoder = self.detect(item.type)
+        return decoder(item.raw_value)
 
 class Item:
     TYPE_NUMERIC = 0
     TYPE_STRING = 1
     TYPE_DATETIME = 2
+    TYPE_SIZE = 3
 
-    def __init__(self, name, _type, begin, offset, decoder=None):
+    def __init__(self, name, _type, begin, offset, decoder=Ext2Decoder()):
         self.name = name
         self.type = _type
         self.begin = begin
         self.offset = offset
         self.decoder = decoder
         self.value = None
+        self.raw_value = None
 
     def get_value(self, superblock):
-        if self.value is None:
-            self.value = self.decode(superblock[self.begin:self.begin + self.offset])
+        if self.raw_value is None:
+            self.raw_value = superblock[self.begin:self.begin + self.offset]
+        
+        self.value = self.decode()
 
         return self.value
 
-    def decode(self, value):
+    def decode(self):
         if self.decoder is not None:
-            return self.decoder(value)
+            return self.decoder.decode(self)
 
-        return value
+        return None
 
 superblock_structure = [
-    Item('s_inodes_count', Item.TYPE_NUMERIC, 0, 4, integer_decoder),
-    Item('s_blocks_count', Item.TYPE_NUMERIC, 4, 4, integer_decoder),
-    Item('s_blocks_count', Item.TYPE_NUMERIC, 4, 4, integer_decoder),
-    Item('s_r_blocks_count', Item.TYPE_NUMERIC, 8, 4, integer_decoder),
-    Item('s_free_blocks_count', Item.TYPE_NUMERIC, 12, 4, integer_decoder),
-    Item('s_free_inodes_count', Item.TYPE_NUMERIC, 16, 4, integer_decoder),
-    Item('s_first_data_block', Item.TYPE_NUMERIC, 20, 4, integer_decoder),
-    Item('s_log_block_size', Item.TYPE_NUMERIC, 24, 4, integer_decoder),
-    Item('s_log_frag_size', Item.TYPE_NUMERIC, 28, 4, integer_decoder),
-    Item('s_blocks_per_group', Item.TYPE_NUMERIC, 32, 4, integer_decoder),
+    Item('s_inodes_count', Item.TYPE_NUMERIC, 0, 4),
+    Item('s_blocks_count', Item.TYPE_NUMERIC, 4, 4),
+    Item('s_blocks_count', Item.TYPE_NUMERIC, 4, 4),
+    Item('s_r_blocks_count', Item.TYPE_NUMERIC, 8, 4),
+    Item('s_free_blocks_count', Item.TYPE_NUMERIC, 12, 4),
+    Item('s_free_inodes_count', Item.TYPE_NUMERIC, 16, 4),
+    Item('s_first_data_block', Item.TYPE_NUMERIC, 20, 4),
+    Item('s_log_block_size', Item.TYPE_SIZE, 24, 4),
+    Item('s_log_frag_size', Item.TYPE_SIZE, 28, 4),
+    Item('s_blocks_per_group', Item.TYPE_NUMERIC, 32, 4),
     Item('s_frags_per_group', Item.TYPE_NUMERIC, 36, 4),
     Item('s_inodes_per_group', Item.TYPE_NUMERIC, 40, 4),
     Item('s_mtime', Item.TYPE_DATETIME, 44, 4),
