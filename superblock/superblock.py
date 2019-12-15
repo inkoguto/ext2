@@ -98,6 +98,8 @@ superblock_structure = [
 
 
 class Superblock:
+    EXT2_MAGIC_NUMBER = 0xef53
+
     class __Superblock:
         def __init__(self, superblock, superblock_structure):
             self.superblock = superblock
@@ -110,9 +112,16 @@ class Superblock:
         else:
             Superblock.instance.superblock = superblock
             Superblock.instance.superblock_structure = superblock_structure
+        
+        self.check_magic_number()
     
     def __getattr__(self, name):
         return getattr(self.instance, name)
+
+    def check_magic_number(self):
+        magic_number = self.get('s_magic')
+        if magic_number != Superblock.EXT2_MAGIC_NUMBER:
+            raise Exception('not ext2')
 
     def get(self, name):
         try:
