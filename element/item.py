@@ -23,6 +23,7 @@ class Item:
     TYPE_STRING = 1
     TYPE_DATETIME = 2
     TYPE_SIZE = 3
+    TYPE_BYTE = 4
 
     def __init__(self, name, _type, begin, offset, decoder=Ext2Decoder()):
         self.name = name
@@ -36,8 +37,11 @@ class Item:
     def get_value(self, superblock):
         if self.raw_value is None:
             self.raw_value = superblock[self.begin:self.begin + self.offset]
-        
-        self.value = self.decode()
+
+        if self.type is not Item.TYPE_BYTE: 
+            self.value = self.decode()
+        else:
+            self.value = self.raw_value
 
         return self.value
 

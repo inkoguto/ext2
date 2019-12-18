@@ -5,6 +5,8 @@ from fs.superblock import Superblock
 from fs.superblock import superblock_structure
 from block_group.descriptor import Descriptor
 from block_group.descriptor import block_group_structure
+from block_group.inode import Inode
+from directory.directory import Directory
 
 filesystem = sys.argv[1] if len(sys.argv) > 1 else 'fs.img'
 
@@ -22,3 +24,18 @@ print('1st block group')
 
 for element in bg.get_all():
     print(element)
+
+
+with open(filesystem, "rb") as file:
+    file.seek(84*1024)
+    inodes = file.read(2*128)
+
+
+i2 = Inode(inodes[128:2*128])
+print('2nd inode')
+print(i2)
+with open(filesystem, "rb") as file:
+    file.seek(298 * 1024)
+    directory = file.read(15*4)
+d = Directory(directory)
+print(d)
