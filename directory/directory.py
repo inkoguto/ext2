@@ -6,7 +6,7 @@ class Directory:
         Item('rec_len', Item.TYPE_NUMERIC, 4, 2),
         Item('name_len', Item.TYPE_NUMERIC, 6, 1),
         Item('file_type', Item.TYPE_NUMERIC, 7, 1),
-        Item('name', Item.TYPE_BYTE, 8, 1)
+        Item('name', Item.TYPE_BYTE, 8, 32),
     ]
 
     def __init__(self, block):
@@ -24,9 +24,10 @@ class Directory:
             setattr(self, element.name, element.get_value(self.block))
     
     def __str__(self):
-        print(self.name)
-        print(self.file_type)
-        print(self.name_len)
-        print(self.rec_len)
-        print(self.inode)
+        print(self.block)
+#        print(self.name)
+#        print(self.file_type)
+#        print(self.name_len)
+#        print(self.rec_len)
+#        print(self.inode)
         return ""

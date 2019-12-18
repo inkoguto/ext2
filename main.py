@@ -28,14 +28,13 @@ for element in bg.get_all():
 
 with open(filesystem, "rb") as file:
     file.seek(84*1024)
-    inodes = file.read(2*128)
+    inodes = file.read(15*128)
 
-
-i2 = Inode(inodes[128:2*128])
+i2 = Inode(inodes[11*128:11*128+128])
 print('2nd inode')
 print(i2)
 with open(filesystem, "rb") as file:
-    file.seek(298 * 1024)
+    file.seek(513 * 1024)
     directory = file.read(15*4)
 d = Directory(directory)
 print(d)
