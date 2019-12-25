@@ -1,6 +1,14 @@
 from element.item import Item
 
+
 class Inode:
+    EXT2_BAD_INO = 1
+    EXT2_ROOT_INO = 2
+    EXT2_ACL_IDX_INO = 3
+    EXT2_ACL_DATA_INO = 4
+    EXT2_BOOT_LOADER_INO = 5
+    EXT2_UNDEL_DIR_INO = 6
+
     STRUCTURE = [
         Item('i_mode', Item.TYPE_BYTE, 0, 2),
         Item('i_uuid', Item.TYPE_NUMERIC, 2, 2),
@@ -24,7 +32,7 @@ class Inode:
 
     def __init__(self, block):
         self.block = block
-        self.i_mode = '' 
+        self.i_mode = ''
         self.i_uid = ''
         self.i_size = ''
         self.i_atime = ''
@@ -55,7 +63,7 @@ class Inode:
     def get_all(self):
         for element in self.STRUCTURE:
             yield [element.name, element.get_value(self.block)]
-        
+
         return None
 
     def get_direct_blocks(self):

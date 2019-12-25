@@ -1,6 +1,6 @@
 from datetime import datetime
 import sys
-
+import binascii
 from fs.superblock import Superblock
 from block_group.descriptor import Descriptor
 from block_group.inode import Inode
@@ -18,7 +18,18 @@ with open(filesystem, "rb") as file:
     file.seek(1024 + sb.s_log_block_size)
     block_group_descriptor = file.read(sb.s_log_block_size)
 
-print(str(Descriptor(block_group_descriptor)))
+descriptor = Descriptor(block_group_descriptor)
+print(str(descriptor))
+
+with open(filesystem, "rb") as file:
+    file.seek(sb.s_log_block_size * descriptor.bg_block_bitmap)
+    block_bitmap = file.read(sb.s_log_block_size)
+    inode_bitmap = file.read(sb.s_log_block_size)
+
+print(block_bitmap)
+print(bin(int(block_bitmap, 16))[2:])
+print("\n")
+print(inode_bitmap[0:2])
 #for element in sb.get_all():
 #    print(element)
 
