@@ -50,6 +50,15 @@ class Inode:
             setattr(self, element.name, element.get_value(self.block))
 
     def __str__(self):
-        print(int.from_bytes(self.i_block[0:4], byteorder='little'))
-        return str(self.i_mode)
+        return str(self.i_block)
 
+    def get_all(self):
+        for element in self.STRUCTURE:
+            yield [element.name, element.get_value(self.block)]
+        
+        return None
+
+    def get_direct_blocks(self):
+        direct_blocks = self.i_block[0:12*4]
+
+        return int.from_bytes(direct_blocks[0:4], byteorder='little')

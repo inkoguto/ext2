@@ -27,14 +27,17 @@ for element in bg.get_all():
 
 
 with open(filesystem, "rb") as file:
-    file.seek(84*1024)
-    inodes = file.read(15*128)
+    file.seek(8*1024)
+    inodes = file.read(11*128)
 
-i2 = Inode(inodes[11*128:11*128+128])
+i2 = Inode(inodes[128:2*128])
 print('2nd inode')
-print(i2)
+for i in i2.get_all():
+    print(i)
+
+print(i2.get_direct_blocks())
 with open(filesystem, "rb") as file:
-    file.seek(513 * 1024)
+    file.seek(24 * 1024)
     directory = file.read(15*4)
 d = Directory(directory)
 print(d)

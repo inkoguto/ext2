@@ -3,7 +3,6 @@ from element.item import Item
 superblock_structure = [
     Item('s_inodes_count', Item.TYPE_NUMERIC, 0, 4),
     Item('s_blocks_count', Item.TYPE_NUMERIC, 4, 4),
-    Item('s_blocks_count', Item.TYPE_NUMERIC, 4, 4),
     Item('s_r_blocks_count', Item.TYPE_NUMERIC, 8, 4),
     Item('s_free_blocks_count', Item.TYPE_NUMERIC, 12, 4),
     Item('s_free_inodes_count', Item.TYPE_NUMERIC, 16, 4),
