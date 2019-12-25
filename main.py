@@ -14,7 +14,11 @@ with open(filesystem, "rb") as file:
 
 sb = Superblock(superblock)
 print(str(sb))
+with open(filesystem, "rb") as file:
+    file.seek(1024 + sb.s_log_block_size)
+    block_group_descriptor = file.read(sb.s_log_block_size)
 
+print(str(Descriptor(block_group_descriptor)))
 #for element in sb.get_all():
 #    print(element)
 

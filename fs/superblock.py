@@ -80,8 +80,8 @@ class Superblock:
             raise Exception('not ext2')
 
     def __str__(self):
-        string = ''
+        superblock = ''
         for item in Superblock.STRUCTURE:
-            string += "{}: {}\n".format(item.name, getattr(self, item.name))
+            superblock += "{}: {}\n".format(item.name, getattr(self, item.name))
 
-        return string
+        return superblock
