@@ -1,42 +1,25 @@
 from datetime import datetime
 import sys
 import binascii
-from fs.superblock import Superblock
+from superblock.superblock import Superblock
+from superblock import get_superblock
 from block_group.descriptor import Descriptor
 from block_group.inode import Inode
 from directory.directory import Directory
 
 filesystem = sys.argv[1] if len(sys.argv) > 1 else 'fs.img'
-
-with open(filesystem, "rb") as file:
-    file.seek(1024)
-    superblock = file.read(1024)
-
-sb = Superblock(superblock)
-print(str(sb))
+sb = get_superblock(filesystem)
 with open(filesystem, "rb") as file:
     file.seek(1024 + sb.s_log_block_size)
     block_group_descriptor = file.read(sb.s_log_block_size)
 
 descriptor = Descriptor(block_group_descriptor)
-print(str(descriptor))
 
 with open(filesystem, "rb") as file:
     file.seek(sb.s_log_block_size * descriptor.bg_block_bitmap)
     block_bitmap = file.read(sb.s_log_block_size)
     inode_bitmap = file.read(sb.s_log_block_size)
-
-print(block_bitmap)
-print(bin(int(block_bitmap, 16))[2:])
-print("\n")
-print(inode_bitmap[0:2])
-#for element in sb.get_all():
-#    print(element)
-
-#for element in bg.get_all():
-#    print(element)
-#
-#
+print("superblock: \n{}\n1st block group: \n{}".format(sb, descriptor))
 #with open(filesystem, "rb") as file:
 #    file.seek(8*1024)
 #    inodes = file.read(11*128)

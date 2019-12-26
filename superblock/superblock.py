@@ -1,3 +1,4 @@
+from math import ceil
 from element.item import Item
 
 class Superblock:
@@ -34,7 +35,7 @@ class Superblock:
         Item('s_block_group_nr', Item.TYPE_NUMERIC, 90, 42),
         Item('s_feature_compat', Item.TYPE_NUMERIC, 92, 4),
         Item('s_feature_incompat', Item.TYPE_NUMERIC, 96, 4),
-        Item('s_featre_ro_compat', Item.TYPE_NUMERIC, 100, 4),
+        Item('s_feature_ro_compat', Item.TYPE_NUMERIC, 100, 4),
         Item('s_uuid', Item.TYPE_NUMERIC, 104, 16),
         Item('s_volume_name', Item.TYPE_STRING, 120, 16),
         Item('s_last_mounted', Item.TYPE_STRING, 136, 64),
@@ -78,6 +79,12 @@ class Superblock:
         magic_number = self.s_magic
         if magic_number != Superblock.EXT2_MAGIC_NUMBER:
             raise Exception('not ext2')
+
+    def get_block_groups_count(self):
+        return ceil(self.s_blocks_count / self.s_blocks_per_group)
+
+    def get_block_group_size(self):
+        return self.s_blocks_per_group * self.s_log_block_size
 
     def __str__(self):
         superblock = ''
