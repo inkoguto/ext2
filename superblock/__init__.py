@@ -23,9 +23,9 @@ def get_superblock(filesystem):
     return Superblock(superblock)
 
 def get_backups(filesystem, superblock):
-    if superblock.get_block_groups_count > 1:
+    if superblock.get_block_groups_count() > 1:
         with open(filesystem, "rb") as file:
-            file.seek(superblock.get_block_group_size())
+            file.seek(superblock.get_block_group_size()+1024)
             backup = file.read(SUPERBLOCK_SIZE)
         
         return backup

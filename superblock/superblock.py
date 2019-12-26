@@ -1,5 +1,5 @@
 from math import ceil
-from element.item import Item
+from item.static import Item
 
 class Superblock:
     EXT2_MAGIC_NUMBER = 0xef53
@@ -32,7 +32,7 @@ class Superblock:
         Item('s_def_resgid', Item.TYPE_NUMERIC, 82, 2),
         Item('s_first_ino', Item.TYPE_NUMERIC, 84, 4),
         Item('s_inode_size', Item.TYPE_NUMERIC, 88, 2),
-        Item('s_block_group_nr', Item.TYPE_NUMERIC, 90, 42),
+        Item('s_block_group_nr', Item.TYPE_BYTE, 90, 42),
         Item('s_feature_compat', Item.TYPE_NUMERIC, 92, 4),
         Item('s_feature_incompat', Item.TYPE_NUMERIC, 96, 4),
         Item('s_feature_ro_compat', Item.TYPE_NUMERIC, 100, 4),
@@ -46,7 +46,7 @@ class Superblock:
         Item('s_journal_inum', Item.TYPE_NUMERIC, 224, 4),
         Item('s_journal_dev', Item.TYPE_NUMERIC, 228, 4),
         Item('s_last_orphan', Item.TYPE_NUMERIC, 232, 4),
-        Item('s_hash_seed', Item.TYPE_NUMERIC, 236, 16),
+        Item('s_hash_seed', Item.TYPE_BYTE, 236, 16),
         Item('s_def_hash_version', Item.TYPE_NUMERIC, 252, 1),
         Item('s_default_mount_options', Item.TYPE_NUMERIC, 256, 4),
         Item('s_first_meta_bg', Item.TYPE_NUMERIC, 260, 4),
