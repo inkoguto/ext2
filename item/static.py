@@ -38,10 +38,10 @@ class Item:
         if self.raw_value is None:
             self.raw_value = superblock[self.begin:self.begin + self.offset]
 
-        if self.type is not Item.TYPE_BYTE: 
-            self.value = self.decode()
-        else:
+        if self.type is Item.TYPE_BYTE:
             self.value = self.raw_value
+        else:
+            self.value = self.decode()
 
         return self.value
 
