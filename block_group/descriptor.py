@@ -1,4 +1,4 @@
-from element.item import Item
+from item.static import Item
 
 class Descriptor:
     STRUCTURE = [
