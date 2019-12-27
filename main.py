@@ -8,9 +8,9 @@ from block_group.inode import Inode
 from block_group import get_block_descriptors
 from directory.directory import Directory
 
-filesystem = sys.argv[1] if len(sys.argv) > 1 else 'fs.img'
-sb = get_superblock(filesystem)
-
-print("superblock: \n{}\n".format(sb))
-for index, descriptor in get_block_descriptors(filesystem, sb):
-    print("{} block group:\n{}".format(index, descriptor))
+if __name__ == "__main__":
+    filesystem = sys.argv[1] if len(sys.argv) > 1 else 'fs.img'
+    sb = get_superblock(filesystem)
+    print("superblock: \n{}\n".format(sb))
+    for index, descriptor in get_block_descriptors(filesystem, sb):
+        print("{} block group:\n{}".format(index, descriptor))
