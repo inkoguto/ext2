@@ -3,7 +3,8 @@ from math import ceil
 from superblock.superblock import Superblock
 
 SUPERBLOCK_SIZE = 1024
-
+BOOT_RECORD = 512
+ADDITIONAL_BOOT_RECORED = 512
 SUPERBLOCKS = [
     1,
     2
