@@ -1,5 +1,5 @@
 from item.static import Item
-
+from block_group.inode import Inode
 
 class Directory:
     def __init__(self, block):
@@ -25,4 +25,25 @@ class Directory:
             setattr(self, element.name, element.get_value(self.block))
 
     def __str__(self):
-        return ""
+        directory = ''
+        for item in self.structure:
+            directory += "{}: {} \n".format(item.name, getattr(self, item.name))
+
+        return directory
+
+def get_root_directory(filesystem, superblock, group_descriptor):
+    block_size = superblock.s_log_block_size
+    inode_table_idx = group_descriptor.bg_inode_table
+    with open(filesystem, 'rb') as file:
+        file.seek(84*1024 + 128)
+        bitmap = file.read(128)
+        inode = Inode(bitmap)
+        dir_addr = inode.get_direct_blocks()
+    
+    print(dir_addr)
+
+    with open(filesystem, 'rb') as file:
+        file.seek(dir_addr * block_size)
+        directory = Directory(file.read(40))
+
+    return directory
