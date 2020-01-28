@@ -6,7 +6,7 @@ from superblock import get_superblock, get_backups
 from block_group.descriptor import Descriptor
 from block_group.inode import Inode
 from block_group import get_block_descriptors
-from directory.directory import get_root_directory
+from directory.directory import get_root_directory, Directory
 
 if __name__ == "__main__":
     filesystem = sys.argv[1] if len(sys.argv) > 1 else 'fs.img'
@@ -18,4 +18,5 @@ if __name__ == "__main__":
         print("{} block group:\n{}".format(index, descriptor))
 
     d = get_root_directory(filesystem, sb, descriptors[0])
-    print(d)
+    directory = Directory(filesystem, d)
+    print(directory)

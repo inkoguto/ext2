@@ -1,49 +1,38 @@
 from item.static import Item
 from block_group.inode import Inode
+from directory.entry import Entry
 
 class Directory:
-    def __init__(self, block):
-        self.structure = [
-            Item('inode', Item.TYPE_NUMERIC, 0, 4),
-            Item('rec_len', Item.TYPE_NUMERIC, 4, 2),
-            Item('name_len', Item.TYPE_NUMERIC, 6, 1),
-            Item('file_type', Item.TYPE_NUMERIC, 7, 1),
-            Item('name', Item.TYPE_BYTE, 8, 32),
-        ]
+    def __init__(self, _file, address):
+        self.entries = []
+        self._file = _file
+        self.address = address
+        self._list()
 
-        self.block = block
-        self.inode = ''
-        self.rec_len = ''
-        self.name_len = ''
-        self.file_type = ''
-        self.name = ''
-
-        self.read()
-
-    def read(self):
-        for element in self.structure:
-            setattr(self, element.name, element.get_value(self.block))
+    def _list(self):
+        with open(self._file, 'rb') as _file:
+            _file.seek(self.address * 1024)
+            while True:
+                entry = Entry(_file)
+                self.entries.append(entry)
+                if entry.is_last_entry():
+                    break
 
     def __str__(self):
-        directory = ''
-        for item in self.structure:
-            directory += "{}: {} \n".format(item.name, getattr(self, item.name))
+        entries = ''
+        for entry in self.entries:
+            entries += "{} \n".format(entry.name)
 
-        return directory
+        return entries
 
 def get_root_directory(filesystem, superblock, group_descriptor):
     block_size = superblock.s_log_block_size
+    inode_size = superblock.s_inode_size
     inode_table_idx = group_descriptor.bg_inode_table
     with open(filesystem, 'rb') as file:
-        file.seek(84*1024 + 128)
-        bitmap = file.read(128)
-        inode = Inode(bitmap)
+        file.seek(inode_table_idx * block_size + inode_size)
+        root_directory = file.read(inode_size)
+        inode = Inode(root_directory)
         dir_addr = inode.get_direct_blocks()
     
-    print(dir_addr)
-
-    with open(filesystem, 'rb') as file:
-        file.seek(dir_addr * block_size)
-        directory = Directory(file.read(40))
-
-    return directory
+    return dir_addr
