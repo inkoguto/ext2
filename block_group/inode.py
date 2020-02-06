@@ -71,5 +71,4 @@ class Inode:
 
     def get_direct_blocks(self):
         direct_blocks = self.i_block[0:12*4]
-
         return int.from_bytes(direct_blocks[0:4], byteorder='little')

@@ -14,25 +14,48 @@ class Directory:
             _file.seek(self.address * 1024)
             while True:
                 entry = Entry(_file)
-                self.entries.append(entry)
                 if entry.is_last_entry():
                     break
+                self.entries.append(entry)
 
-    def __str__(self):
-        entries = ''
+    def ls(self):
+        entries = 'name type\n'
+        entries += '--- ---'
         for entry in self.entries:
-            entries += "{} \n".format(entry.name)
+            entries += "\n{} {}".format(entry.name, entry.file_type)
 
-        return entries
+        return self.padding(entries)
+
+    def get_info(self, name):
+        for entry in self.entries:
+            if name == entry.name:
+                return str(entry)
+
+    def padding(self, text):
+        formatted_text = ''
+        arr = text.split('\n')
+        length = 0
+        for ell in arr:
+            for txt in ell.split(' '):
+                if len(txt) > length:
+                    length = len(txt)
+        
+        spacing = length + 5
+        for ell in arr:
+            txt = ell.split(' ')
+            formatted_text += "{0:{spaces}}{1}\n".format(txt[0], txt[1], spaces=spacing) 
+        return formatted_text
+
 
 def get_root_directory(filesystem, superblock, group_descriptor):
     block_size = superblock.s_log_block_size
     inode_size = superblock.s_inode_size
     inode_table_idx = group_descriptor.bg_inode_table
     with open(filesystem, 'rb') as file:
-        file.seek(inode_table_idx * block_size + inode_size)
+        idx = inode_table_idx * block_size + inode_size
+        file.seek(idx)
         root_directory = file.read(inode_size)
         inode = Inode(root_directory)
         dir_addr = inode.get_direct_blocks()
     
-    return dir_addr
+    return Directory(filesystem, dir_addr)

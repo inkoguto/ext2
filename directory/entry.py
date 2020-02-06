@@ -25,9 +25,7 @@ class Entry:
 
         for element in self.structure:
             bitmap = self.read_filesystem(element.offset)
-            print(self._file.tell())
             setattr(self, element.name, element.get_value(bitmap))
-#            print("{}: {}\n".format(element.name, getattr(self, element.name)))
         self.name = Item('name', Item.TYPE_STRING, 0, self.rec_len).get_value(self.read_filesystem(self.name_len))
         padding = self.rec_len - (4 + 2 + 1 + 1 + self.name_len)
         self._file.read(padding)
@@ -39,4 +37,14 @@ class Entry:
         return self.file_type == Entry.EXT2_FT_UNKNOWN
 
     def __str__(self):
-        return "{}\n".format(self.name)
+        str_repr = ''
+        for item in self.structure:
+            str_repr += "{}: {}\n".format(item.name, getattr(self, item.name))
+
+        return str_repr
+    
+    def get_inode(self):
+        return self.inode
+
+    def get_file_type(self):
+        return self.file_type

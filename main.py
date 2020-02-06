@@ -17,6 +17,6 @@ if __name__ == "__main__":
         descriptors.append(descriptor)
         print("{} block group:\n{}".format(index, descriptor))
 
-    d = get_root_directory(filesystem, sb, descriptors[0])
-    directory = Directory(filesystem, d)
-    print(directory)
+    directory = get_root_directory(filesystem, sb, descriptors[0])
+    print(directory.ls())
+    print(directory.get_info('test'))
