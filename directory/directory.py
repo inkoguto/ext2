@@ -1,33 +1,61 @@
 from item.static import Item
+from block_group.inode import Inode
+from directory.entry import Entry
 
 class Directory:
-    STRUCTURE = [
-        Item('inode', Item.TYPE_NUMERIC, 0, 4),
-        Item('rec_len', Item.TYPE_NUMERIC, 4, 2),
-        Item('name_len', Item.TYPE_NUMERIC, 6, 1),
-        Item('file_type', Item.TYPE_NUMERIC, 7, 1),
-        Item('name', Item.TYPE_BYTE, 8, 32),
-    ]
+    def __init__(self, _file, address):
+        self.entries = []
+        self._file = _file
+        self.address = address
+        self._list()
 
-    def __init__(self, block):
-        self.block = block
-        self.inode = ''
-        self.rec_len = ''
-        self.name_len = ''
-        self.file_type = ''
-        self.name = ''
+    def _list(self):
+        with open(self._file, 'rb') as _file:
+            _file.seek(self.address * 1024)
+            while True:
+                entry = Entry(_file)
+                if entry.is_last_entry():
+                    break
+                self.entries.append(entry)
 
-        self.read()
+    def ls(self):
+        entries = 'name type\n'
+        entries += '--- ---'
+        for entry in self.entries:
+            entries += "\n{} {}".format(entry.name, entry.file_type)
 
-    def read(self):
-        for element in Directory.STRUCTURE:
-            setattr(self, element.name, element.get_value(self.block))
+        return self.padding(entries)
+
+    def get_info(self, name):
+        for entry in self.entries:
+            if name == entry.name:
+                return str(entry)
+
+    def padding(self, text):
+        formatted_text = ''
+        arr = text.split('\n')
+        length = 0
+        for ell in arr:
+            for txt in ell.split(' '):
+                if len(txt) > length:
+                    length = len(txt)
+        
+        spacing = length + 5
+        for ell in arr:
+            txt = ell.split(' ')
+            formatted_text += "{0:{spaces}}{1}\n".format(txt[0], txt[1], spaces=spacing) 
+        return formatted_text
+
+
+def get_root_directory(filesystem, superblock, group_descriptor):
+    block_size = superblock.s_log_block_size
+    inode_size = superblock.s_inode_size
+    inode_table_idx = group_descriptor.bg_inode_table
+    with open(filesystem, 'rb') as file:
+        idx = inode_table_idx * block_size + inode_size
+        file.seek(idx)
+        root_directory = file.read(inode_size)
+        inode = Inode(root_directory)
+        dir_addr = inode.get_direct_blocks()
     
-    def __str__(self):
-        print(self.block)
-#        print(self.name)
-#        print(self.file_type)
-#        print(self.name_len)
-#        print(self.rec_len)
-#        print(self.inode)
-        return ""
+    return Directory(filesystem, dir_addr)
