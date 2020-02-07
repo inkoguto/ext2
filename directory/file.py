@@ -1,6 +1,6 @@
 from item.static import Item
 
-class Entry:
+class File:
     EXT2_FT_UNKNOWN = 0
     EXT2_FT_REG_FILE = 1
     EXT2_FT_DIR = 2
@@ -33,8 +33,8 @@ class Entry:
     def read_filesystem(self, length):
         return self._file.read(length)
 
-    def is_last_entry(self):
-        return self.file_type == Entry.EXT2_FT_UNKNOWN
+    def is_last_file(self):
+        return self.file_type == File.EXT2_FT_UNKNOWN
 
     def __str__(self):
         str_repr = ''

@@ -1,35 +1,35 @@
 from item.static import Item
 from block_group.inode import Inode
-from directory.entry import Entry
+from directory.file import File
 
 class Directory:
-    def __init__(self, _file, address):
-        self.entries = []
-        self._file = _file
+    def __init__(self, _filesystem, address):
+        self.files = []
+        self._filesystem = _filesystem
         self.address = address
         self._list()
 
     def _list(self):
-        with open(self._file, 'rb') as _file:
-            _file.seek(self.address * 1024)
+        with open(self._filesystem, 'rb') as _filesystem:
+            _filesystem.seek(self.address * 1024)
             while True:
-                entry = Entry(_file)
-                if entry.is_last_entry():
+                _file = File(_filesystem)
+                if _file.is_last_file():
                     break
-                self.entries.append(entry)
+                self.files.append(_file)
 
     def ls(self):
         entries = 'name type\n'
         entries += '--- ---'
-        for entry in self.entries:
-            entries += "\n{} {}".format(entry.name, entry.file_type)
+        for _file in self.files:
+            entries += "\n{} {}".format(_file.name, _file.file_type)
 
         return self.padding(entries)
 
     def get_info(self, name):
-        for entry in self.entries:
-            if name == entry.name:
-                return str(entry)
+        for _file in self.files:
+            if name == _file.name:
+                return str(_file)
 
     def padding(self, text):
         formatted_text = ''
@@ -59,3 +59,6 @@ def get_root_directory(filesystem, superblock, group_descriptor):
         dir_addr = inode.get_direct_blocks()
     
     return Directory(filesystem, dir_addr)
+
+def get_directory(filesystem, inode):
+    pass
