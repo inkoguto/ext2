@@ -1,6 +1,7 @@
 from item.static import Item
 from block_group.inode import Inode
 from directory.file import File
+from superblock.superblock import Superblock
 
 class Directory:
     def __init__(self, _filesystem, address):
@@ -47,7 +48,8 @@ class Directory:
         return formatted_text
 
 
-def get_root_directory(filesystem, superblock, group_descriptor):
+def get_root_directory(filesystem, group_descriptor):
+    superblock = Superblock()
     block_size = superblock.s_log_block_size
     inode_size = superblock.s_inode_size
     inode_table_idx = group_descriptor.bg_inode_table

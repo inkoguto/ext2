@@ -1,5 +1,5 @@
 from item.static import Item
-
+from superblock.superblock import Superblock
 
 class Descriptor:
     def __init__(self, block_group):

@@ -1,5 +1,5 @@
 from item.static import Item
-
+from superblock.superblock import Superblock
 
 class Inode:
     EXT2_BAD_INO = 1
@@ -72,3 +72,11 @@ class Inode:
     def get_direct_blocks(self):
         direct_blocks = self.i_block[0:12*4]
         return int.from_bytes(direct_blocks[0:4], byteorder='little')
+
+
+def get_inode(filesystem, index):
+    superblock = Superblock()
+    inode_size = superblock.get_inode_size()
+    inodes_per_group = superblock.get_inodes_per_group()
+    with open(filesystem, 'rb') as _file:
+       pass 

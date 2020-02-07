@@ -58,12 +58,13 @@ class Superblock:
 
     instance = None
 
-    def __init__(self, superblock):
+    def __init__(self, superblock = None):
         if not Superblock.instance:
             Superblock.instance = Superblock.__Superblock(
                 superblock)
         else:
-            Superblock.instance.superblock = superblock
+            if superblock is not None:
+                Superblock.instance.superblock = superblock
 
         self.read()
         self.check_magic_number()
@@ -85,6 +86,12 @@ class Superblock:
 
     def get_block_group_size(self):
         return self.s_blocks_per_group * self.s_log_block_size
+
+    def get_inode_size(self):
+        return self.s_inode_size
+
+    def get_inodes_per_group(self):
+        return self.s_inodes_per_group
 
     def __str__(self):
         superblock = ''
