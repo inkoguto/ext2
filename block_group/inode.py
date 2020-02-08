@@ -1,5 +1,9 @@
 from item.static import Item
 from superblock.superblock import Superblock
+from block_group import get_block_descriptor
+from filesystem import Filesystem
+from superblock.superblock import Superblock
+from math import floor
 
 class Inode:
     EXT2_BAD_INO = 1
@@ -9,7 +13,7 @@ class Inode:
     EXT2_BOOT_LOADER_INO = 5
     EXT2_UNDEL_DIR_INO = 6
 
-    def __init__(self, block):
+    def __init__(self, index):
         self.structure = [
             Item('i_mode', Item.TYPE_BYTE, 0, 2),
             Item('i_uuid', Item.TYPE_NUMERIC, 2, 2),
@@ -30,8 +34,8 @@ class Inode:
             Item('i_faddr', Item.TYPE_NUMERIC, 112, 4),
             Item('i_osd2', Item.TYPE_NUMERIC, 116, 12)
         ]
-
-        self.block = block
+        address = self.get_address(index)
+        self.block = Filesystem().read(address, Superblock().get_inode_size())
         self.i_mode = ''
         self.i_uid = ''
         self.i_size = ''
@@ -53,6 +57,16 @@ class Inode:
 
         self.read()
 
+    def get_address(self, index):
+        inodes_per_group = Superblock().get_inodes_per_group()
+        inode_size = Superblock().get_inode_size()
+        block_size = Superblock().get_block_size()
+        block_group = floor((index - 1) / inodes_per_group)
+        local_addr = (index - 1) % inodes_per_group
+        descriptor = get_block_descriptor(block_group)
+
+        return descriptor.bg_inode_table * block_size + local_addr * inode_size
+
     def read(self):
         for element in self.structure:
             setattr(self, element.name, element.get_value(self.block))
@@ -63,20 +77,6 @@ class Inode:
             inode += "{}: {} \n".format(item.name, getattr(self, item.name))
         return inode
 
-    def get_all(self):
-        for element in self.structure:
-            yield [element.name, element.get_value(self.block)]
-
-        return None
-
     def get_direct_blocks(self):
         direct_blocks = self.i_block[0:12*4]
         return int.from_bytes(direct_blocks[0:4], byteorder='little')
-
-
-def get_inode(filesystem, index):
-    superblock = Superblock()
-    inode_size = superblock.get_inode_size()
-    inodes_per_group = superblock.get_inodes_per_group()
-    with open(filesystem, 'rb') as _file:
-       pass 

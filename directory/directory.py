@@ -49,16 +49,9 @@ class Directory:
 
 
 def get_root_directory(filesystem, group_descriptor):
-    superblock = Superblock()
-    block_size = superblock.s_log_block_size
-    inode_size = superblock.s_inode_size
-    inode_table_idx = group_descriptor.bg_inode_table
-    with open(filesystem, 'rb') as file:
-        idx = inode_table_idx * block_size + inode_size
-        file.seek(idx)
-        root_directory = file.read(inode_size)
-        inode = Inode(root_directory)
-        dir_addr = inode.get_direct_blocks()
+    inode = Inode(2)
+    print(inode)
+    dir_addr = inode.get_direct_blocks()
     
     return Directory(filesystem, dir_addr)
 

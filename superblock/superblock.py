@@ -74,7 +74,7 @@ class Superblock:
 
     def read(self):
         for item in Superblock.STRUCTURE:
-            setattr(self, item.name, item.get_value(self.superblock))
+            setattr(self.instance, item.name, item.get_value(self.superblock))
 
     def check_magic_number(self):
         magic_number = self.s_magic
@@ -92,6 +92,9 @@ class Superblock:
 
     def get_inodes_per_group(self):
         return self.s_inodes_per_group
+
+    def get_block_size(self):
+        return self.s_log_block_size
 
     def __str__(self):
         superblock = ''
