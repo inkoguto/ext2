@@ -25,18 +25,17 @@ class Item:
     TYPE_SIZE = 3
     TYPE_BYTE = 4
 
-    def __init__(self, name, _type, begin, offset, decoder=Ext2Decoder()):
+    def __init__(self, name, _type, offset, length, decoder=Ext2Decoder()):
         self.name = name
         self.type = _type
-        self.begin = begin
         self.offset = offset
+        self.length = length
         self.decoder = decoder
         self.value = None
         self.raw_value = None
 
-    def get_value(self, superblock):
-        if self.raw_value is None:
-            self.raw_value = superblock[self.begin:self.begin + self.offset]
+    def get_value(self, block):
+        self.raw_value = block[self.offset:self.offset + self.length]
 
         if self.type is Item.TYPE_BYTE:
             self.value = self.raw_value

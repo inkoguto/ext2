@@ -1,9 +1,13 @@
 from math import ceil
 from item.static import Item
+from factory.filesystem import filesystem_factory
+
 
 class Superblock:
     EXT2_MAGIC_NUMBER = 0xef53
-
+    SUPERBLOCK_SIZE = 1024
+    BOOT_RECORD = 512
+    ADDITIONAL_BOOT_RECORED = 512
     STRUCTURE = [
         Item('s_inodes_count', Item.TYPE_NUMERIC, 0, 4),
         Item('s_blocks_count', Item.TYPE_NUMERIC, 4, 4),
@@ -54,11 +58,14 @@ class Superblock:
 
     class __Superblock:
         def __init__(self, superblock):
-            self.superblock = superblock
-
+            filesystem = filesystem_factory.get()
+            self.superblock = filesystem.read(
+                Superblock.BOOT_RECORD + Superblock.ADDITIONAL_BOOT_RECORED,
+                Superblock.SUPERBLOCK_SIZE
+            )
     instance = None
 
-    def __init__(self, superblock = None):
+    def __init__(self, superblock=None):
         if not Superblock.instance:
             Superblock.instance = Superblock.__Superblock(
                 superblock)
@@ -99,6 +106,7 @@ class Superblock:
     def __str__(self):
         superblock = ''
         for item in Superblock.STRUCTURE:
-            superblock += "{}: {}\n".format(item.name, getattr(self, item.name))
+            superblock += "{}: {}\n".format(item.name,
+                                            getattr(self, item.name))
 
         return superblock

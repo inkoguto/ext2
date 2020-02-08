@@ -20,7 +20,9 @@ class Filesystem:
     def __setattr__(self, name, value):
         setattr(self.instance, name, value)
 
-    def read(self, address, offset):
+    def read(self, offset, length, relative = 0):
         with open(self.name, 'rb') as _file:
-            _file.seek(address)
-            return _file.read(offset)
+            _file.seek(offset, relative)
+            result = _file.read(length)
+
+        return result
