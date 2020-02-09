@@ -1,7 +1,6 @@
 from item.static import Item
 from block_group.inode import Inode
 from directory.file import File
-from superblock.superblock import Superblock
 from factory.filesystem import filesystem_factory
 from factory.superblock import superblock_factory
 
@@ -58,22 +57,25 @@ class Directory:
         start = self.superblock.get_block_size() * self.address
         return start + offset
 
-    def ls(self):
-        files = 'name type created_at size\n'
-        files += '--- --- --- ---'
+    def __str__(self):
+        files = 'name type created_at size inode\n'
+        files += '--- --- --- --- ---'
         current = self.file
         while current is not None:
-            files += "\n{} {} {} {}".format(
+            files += "\n{} {} {} {} {}".format(
                 current.file_name,
                 current.file_type,
                 current.get_inode().i_ctime,
-                current.get_inode().i_size
+                current.get_inode().i_size,
+                current.inode
             )
             current = current.next_file
 
         return self.padding(files)
 
-    def padding(self, text):
+
+    @staticmethod
+    def padding(text):
         formatted_text = ''
         arr = text.split('\n')
         length = 0
@@ -85,8 +87,9 @@ class Directory:
         spacing = length + 5
         for ell in arr:
             txt = ell.split(' ')
-            formatted_text += "{0:{spaces}} {1}   {2}    {3}\n".format(
-                txt[0], txt[1], txt[2], txt[3], spaces=spacing)
+
+            formatted_text += "{name: <{spaces}}{type: <5}{created_at: <20}{size: <10}{inode: <10}\n".format(
+                name=txt[0], type=txt[1], created_at=txt[2], size=txt[3], inode=txt[4], spaces=spacing)
         return formatted_text
 
 
@@ -95,3 +98,16 @@ def get_root_directory():
     dir_addr = inode.get_direct_blocks()
 
     return Directory(dir_addr)
+
+
+def change_directory(directory, name):
+    current = directory.file
+    while current is not None:
+        if current.file_name == name:
+            break
+        current = current.next_file
+
+    if current.file_type == File.EXT2_FT_DIR:
+        return Directory(current._inode.get_direct_blocks())
+
+    raise Exception('cannot cd into file')
