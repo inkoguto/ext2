@@ -1,8 +1,5 @@
-from block_group.descriptor import Descriptor
-from block_group.inode import Inode
 from block_group import get_block_descriptor
-from directory.directory import get_root_directory, Directory
-from filesystem import Filesystem
+from directory.directory import get_root_directory
 from factory.superblock import superblock_factory
 
 if __name__ == "__main__":
@@ -12,5 +9,5 @@ if __name__ == "__main__":
         descriptor = get_block_descriptor(index)
         print("{} block group:\n{}".format(index, descriptor))
 
-    directory = get_root_directory(get_block_descriptor(0))
+    directory = get_root_directory()
     print(directory.ls())

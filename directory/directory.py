@@ -59,11 +59,16 @@ class Directory:
         return start + offset
 
     def ls(self):
-        files = 'name type created_at\n'
-        files += '--- --- ---'
+        files = 'name type created_at size\n'
+        files += '--- --- --- ---'
         current = self.file
         while current is not None:
-            files += "\n{} {} {}".format(current.file_name, current.file_type, current.get_inode().i_ctime)
+            files += "\n{} {} {} {}".format(
+                current.file_name,
+                current.file_type,
+                current.get_inode().i_ctime,
+                current.get_inode().i_size
+            )
             current = current.next_file
 
         return self.padding(files)
@@ -80,12 +85,12 @@ class Directory:
         spacing = length + 5
         for ell in arr:
             txt = ell.split(' ')
-            formatted_text += "{0:{spaces}}{1} {2}\n".format(
-                txt[0], txt[1], txt[2], spaces=spacing)
+            formatted_text += "{0:{spaces}} {1}   {2}    {3}\n".format(
+                txt[0], txt[1], txt[2], txt[3], spaces=spacing)
         return formatted_text
 
 
-def get_root_directory(group_descriptor):
+def get_root_directory():
     inode = Inode(2)
     dir_addr = inode.get_direct_blocks()
 
