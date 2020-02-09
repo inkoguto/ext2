@@ -1,4 +1,4 @@
-from item.static import Item
+from block_group.inode import Inode
 
 class File:
     EXT2_FT_UNKNOWN = 0
@@ -17,15 +17,17 @@ class File:
         self.file_type = 0
         self.file_name = ''
         self.next_file = None
+        self._inode = None
 
     def is_last_file(self):
         return self.file_type == File.EXT2_FT_UNKNOWN
 
     def __str__(self):
         return str(self.file_name)
-    
+
     def get_inode(self):
-        return self.inode
+        self._inode = Inode(self.inode)
+        return self._inode
 
     def get_file_type(self):
         return self.file_type

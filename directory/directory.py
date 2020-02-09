@@ -59,11 +59,11 @@ class Directory:
         return start + offset
 
     def ls(self):
-        files = 'name type\n'
-        files += '--- ---'
+        files = 'name type created_at\n'
+        files += '--- --- ---'
         current = self.file
         while current is not None:
-            files += "\n{} {}".format(current.file_name, current.file_type)
+            files += "\n{} {} {}".format(current.file_name, current.file_type, current.get_inode().i_ctime)
             current = current.next_file
 
         return self.padding(files)
@@ -80,8 +80,8 @@ class Directory:
         spacing = length + 5
         for ell in arr:
             txt = ell.split(' ')
-            formatted_text += "{0:{spaces}}{1}\n".format(
-                txt[0], txt[1], spaces=spacing)
+            formatted_text += "{0:{spaces}}{1} {2}\n".format(
+                txt[0], txt[1], txt[2], spaces=spacing)
         return formatted_text
 
 
