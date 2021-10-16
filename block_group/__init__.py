@@ -1,13 +1,13 @@
 from block_group.descriptor import Descriptor
+from superblock.superblock import Superblock
+from filesystem import Filesystem
 
-BLOCK_GROUP_SIZE = 32
 
-def get_block_descriptors(filesystem, superblock):
-    count = superblock.get_block_groups_count()
-    block_size = superblock.s_log_block_size
-    with open(filesystem, 'rb') as filehandler:
-        filehandler.seek(2 * block_size)
-        for i in range(count):
-            yield i, Descriptor(filehandler.read(BLOCK_GROUP_SIZE))
+descriptor_cache = {}
 
-    return None
+def get_block_descriptor(index):
+    if index in descriptor_cache:
+        return descriptor_cache[index]
+    descriptor_cache[index] = Descriptor(index)
+
+    return descriptor_cache[index]

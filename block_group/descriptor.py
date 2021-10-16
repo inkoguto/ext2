@@ -1,8 +1,13 @@
 from item.static import Item
-
+from superblock.superblock import Superblock
+from filesystem import Filesystem
 
 class Descriptor:
-    def __init__(self, block_group):
+    START = 2048
+    BLOCK_GROUP_SIZE = 32
+
+
+    def __init__(self, index = 0):
         self.structure = [
             Item('bg_block_bitmap', Item.TYPE_NUMERIC, 0, 4),
             Item('bg_inode_bitmap', Item.TYPE_NUMERIC, 4, 4),
@@ -13,8 +18,8 @@ class Descriptor:
             Item('bg_pad', Item.TYPE_NUMERIC, 18, 2),
             Item('bg_reserved', Item.TYPE_NUMERIC, 20, 12)
         ]
-
-        self.block_group = block_group
+        filesystem = Filesystem()
+        self.block_group = filesystem.read(Descriptor.START + index * Descriptor.BLOCK_GROUP_SIZE, Descriptor.BLOCK_GROUP_SIZE)
         self.read()
 
     def read(self):
